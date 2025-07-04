@@ -33,30 +33,29 @@ guardrail_agent = Agent(
 async def health_guardrail(
     ctx: RunContextWrapper[None], agent: Agent, input: str | list[TResponseInputItem]
 ) -> GuardrailFunctionOutput:
-    # Convert input to string if it's a list
     if isinstance(input, list):
         input_text = " ".join(str(i) for i in input)
     else:
         input_text = input
 
-    # Validate goal format (e.g., "lose 5kg in 2 months")
-    goal_pattern = r"(lose|gain|maintain)\s+\d+\s*(kg|lbs|pounds|kilograms)\s+in\s+\d+\s*(days|weeks|months|years)"
-    if not re.search(goal_pattern, input_text.lower()):
-        return GuardrailFunctionOutput(
-            output_info="Please specify your goal in the format: action + quantity + metric + duration (e.g., 'lose 5kg in 2 months').",
-            tripwire_triggered=True,
-        )
-
-    # Block incomplete entries
+    goal_pattern = r"(lose|gain|maintain|improve|reduce|increase|build|help|plan|diet|workout|exercise|meal|weight|muscle|fitness)"
     if len(input_text.strip()) < 10:
         return GuardrailFunctionOutput(
             output_info="Your input is too short. Please provide more details.",
             tripwire_triggered=True,
         )
 
-    # Add more checks for dietary/injury input as needed
+    if not re.search(goal_pattern, input_text.lower()):
+        return GuardrailFunctionOutput(
+            output_info="Please specify a health-related goal or request (e.g., 'I want to lose weight', 'Help me improve my fitness', 'Suggest a meal plan').",
+            tripwire_triggered=True,
+        )
 
-    # Otherwise, run the guardrail agent as before
+    # Optionally, check strict pattern, but do not block or warn
+    # strict_pattern = r"(lose|gain|maintain)\s+\d+\s*(kg|lbs|pounds|kilograms)\s+in\s+\d+\s*(days|weeks|months|years)"
+    # if not re.search(strict_pattern, input_text.lower()):
+    #     pass  # No warning, just allow
+
     result = await Runner.run(guardrail_agent, input=input, run_config=config)
     return GuardrailFunctionOutput(
         output_info=result.final_output,

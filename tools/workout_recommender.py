@@ -9,7 +9,7 @@ async def workout_recommender(
     experience: str = "",
     preferences: str = "",
     context: Optional[UserSessionContext] = None
-) -> str:
+) -> dict:
     """
     Asynchronously suggest a 7-day workout plan based on the user's goals and experience.
 
@@ -20,7 +20,7 @@ async def workout_recommender(
         context (UserSessionContext, optional): Shared user session context.
 
     Returns:
-        str: A personalized 7-day workout plan.
+        dict: A dictionary with a personalized 7-day workout plan.
     """
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     workout_plan = [
@@ -28,24 +28,8 @@ async def workout_recommender(
     ]
     await asyncio.sleep(0)  # Simulate async operation
 
-    context_info = ""
-    if context:
-        context_info = (
-            f"\n\nContext info:\n"
-            f"Name: {context.name}\n"
-            f"UID: {context.uid}\n"
-            f"Goal: {context.goal}\n"
-            f"Diet Preferences: {context.diet_preferences}\n"
-            f"Workout Plan: {context.workout_plan}\n"
-            f"Meal Plan: {context.meal_plan}\n"
-            f"Injury Notes: {context.injury_notes}\n"
-            f"Handoff Logs: {context.handoff_logs}\n"
-            f"Progress Logs: {context.progress_logs}\n"
-        )
-
-    return (
-        f"Here is your personalized 7-day workout plan based on your goal '{goal}', "
-        f"experience '{experience}', and preferences '{preferences}':\n\n" +
-        "\n".join(workout_plan) +
-        context_info
-    )
+    # Optionally, you can still include context_info for debugging/logging
+    # but the main return should be a dict for agent output parsing
+    return {
+        "workout_plan": workout_plan
+    }
