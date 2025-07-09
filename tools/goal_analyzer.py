@@ -1,8 +1,6 @@
 from agents import function_tool
-from typing import Optional
+from typing import Optional, List, Dict
 from context import UserSessionContext
-
-
 
 @function_tool
 def goal_analyzer(
@@ -10,9 +8,9 @@ def goal_analyzer(
     preferences: Optional[str] = None,
     lifestyle: Optional[str] = None,
     context: Optional[UserSessionContext] = None
-) -> str:
+) -> Dict:
     """
-    Analyze the user's goal and provide a personalized health and wellness plan.
+    Analyze the user's goal and return a structured health plan with sample meal and workout plans.
 
     Args:
         goal (str): The user's health and wellness goal.
@@ -21,24 +19,41 @@ def goal_analyzer(
         context (UserSessionContext, optional): Shared user session context.
 
     Returns:
-        str: A personalized health and wellness plan.
+        dict: A partial HealthPlanOutput structure with meal_plan, workout_plan, and notes.
     """
-    context_info = ""
+    print("📌 [Tool Triggered] goal_analyzer")
+
+    # Update context
     if context:
-        context_info = (
-            f"\n\nContext info:\n"
-            f"Name: {context.name}\n"
-            f"UID: {context.uid}\n"
-            f"Goal: {context.goal}\n"
-            f"Diet Preferences: {context.diet_preferences}\n"
-            f"Workout Plan: {context.workout_plan}\n"
-            f"Meal Plan: {context.meal_plan}\n"
-            f"Injury Notes: {context.injury_notes}\n"
-            f"Handoff Logs: {context.handoff_logs}\n"
-            f"Progress Logs: {context.progress_logs}\n"
-        )
-    return (
-        f"Based on your goal of '{goal}', your preferences of '{preferences}', and your lifestyle of '{lifestyle}', "
-        f"here is your personalized health and wellness plan."
-        f"{context_info}"
-    )
+        context.goal = {
+            "goal": goal,
+            "preferences": preferences,
+            "lifestyle": lifestyle
+        }
+
+    # Generate basic mock data
+    meal_plan = [
+        "Day 1: Chickpea salad",
+        "Day 2: Quinoa with vegetables",
+        "Day 3: Lentil soup with whole grain bread",
+        "Day 4: Grilled tofu with brown rice",
+        "Day 5: Oats and fruit bowl",
+        "Day 6: Stir-fried veggies",
+        "Day 7: Vegetable soup and roti"
+    ]
+
+    workout_plan = [
+        "Day 1: Brisk walk (30 mins)",
+        "Day 2: Strength training (bodyweight)",
+        "Day 3: Rest or light stretching",
+        "Day 4: Cardio workout (HIIT style)",
+        "Day 5: Yoga or Pilates",
+        "Day 6: Strength training (core focus)",
+        "Day 7: Rest day"
+    ]
+
+    return {
+        "meal_plan": meal_plan,
+        "workout_plan": workout_plan,
+        "notes": f"Plan based on goal: '{goal}', preferences: '{preferences}', lifestyle: '{lifestyle}'."
+    }

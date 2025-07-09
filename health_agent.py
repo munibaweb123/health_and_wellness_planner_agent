@@ -16,7 +16,10 @@ import re
 class HealthPlanOutput(BaseModel):
     meal_plan: Optional[List[str]] = None
     workout_plan: Optional[List[str]] = None
+    schedule: Optional[List[str]] = None  # <- added for schedular
+    tracking_summary: Optional[str] = None  # <- added for tracker
     notes: Optional[str] = None
+
 
 class Health_Output(BaseModel):
     is_health_and_wellness: bool
