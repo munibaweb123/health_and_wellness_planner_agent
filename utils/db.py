@@ -1,6 +1,4 @@
-import datetime
 import sqlite3
-
 
 def save_progress_to_db(user_id: str, user_name: str, progress_update: str):
     conn = sqlite3.connect("user_progress.db")
@@ -15,13 +13,23 @@ def save_progress_to_db(user_id: str, user_name: str, progress_update: str):
         )
     """)
     cursor.execute(
-        "INSERT INTO progress_logs (user_id, user_name, progress_update, timestamp) VALUES (?, ?, ?, ?)",
-        (
-            user_id,
-            user_name,
-            progress_update,
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # ✅ FIXED
-        )
+        "INSERT INTO progress_logs (user_id, user_name, progress_update, timestamp) VALUES (?, ?, ?, datetime('now'))",
+        (user_id, user_name, progress_update)
     )
     conn.commit()
     conn.close()
+
+def get_user_logs(user_id: str):
+    conn = sqlite3.connect("user_progress.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT user_name, progress_update, timestamp FROM progress_logs WHERE user_id = ? ORDER BY timestamp",
+        (user_id,)
+    )
+    logs = cursor.fetchall()
+    conn.close()
+
+    return [
+        {"name": name, "update": update, "timestamp": timestamp}
+        for name, update, timestamp in logs
+    ]
