@@ -97,7 +97,7 @@ async def health_output_guardrail(
 
 health_agent = Agent(
     name="Health and wellness planner agent",
-    instructions="You are a health and wellness planner agent. You will use tools to help users create personalized health and wellness plans based on their goals, preferences, and lifestyle.",
+    instructions="You are a health and wellness planner agent. You will use tools to help users create personalized health and wellness plans based on their goals, preferences, and lifestyle. and handoffs to other agents for specialized support.",
     model=openai_model,
     tools=[goal_analyzer, meal_planner, schedular, tracker, workout_recommender],
     handoffs=[escalation_agent, injury_support_agent, nutrition_expert_agent],
