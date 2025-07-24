@@ -1,34 +1,32 @@
-from agents import function_tool
-import asyncio
-from typing import Optional, List
-from context import UserSessionContext
+from agents import function_tool, RunContextWrapper
+from user_context import UserSessionContext, MealPlan
+from typing import List
 
 @function_tool
 async def meal_planner(
+    ctx: RunContextWrapper[UserSessionContext],
     goal: str,
     preferences: str = "",
     lifestyle: str = "",
-    context: Optional[UserSessionContext] = None,
 ) -> List[str]:
     """
-    Asynchronously create a personalized 7-day meal plan based on the user's health and wellness goals, dietary preferences, and lifestyle.
-
-    Returns:
-        List[str]: A list of 7 meal plan entries.
+    Generates a personalized 7-day meal plan based on goal, preferences, and lifestyle.
     """
-    print("🥗 [Tool Triggered] meal_planner")
 
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    meal_plan = [
-        f"{day}: Breakfast - Oatmeal with fruit, Lunch - Chickpea salad, Dinner - Grilled vegetables"
-        for day in days
-    ]
+    async def _meal_planner(context: UserSessionContext) -> List[str]:
+        print("🥗 [Tool Triggered] meal_planner")
 
-    # Simulate async behavior
-    await asyncio.sleep(0)
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        plan = [
+            f"{day}: Breakfast - Oatmeal with fruit, Lunch - Chickpea salad, Dinner - Grilled vegetables"
+            for day in days
+        ]
 
-    # Optionally store in context
-    if context:
-        context.meal_plan = meal_plan
+        # Store meal plan in context
+        if context.meal_plan is None:
+            context.meal_plan = MealPlan()
+        context.meal_plan.days = plan
 
-    return meal_plan
+        return plan
+
+    return await ctx.run(_meal_planner)

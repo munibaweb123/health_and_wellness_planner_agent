@@ -1,37 +1,47 @@
-from agents import function_tool
-from typing import Optional, List, Dict
-from context import UserSessionContext
+# Assuming this is your tools.py or similar file
+from agents import function_tool, RunContextWrapper
+from typing import Dict, List
+# IMPORT NECESSARY PYDANTIC MODELS FROM user_context.py
+from user_context import UserSessionContext, Goal, MealPlan, WorkoutPlan, MealDay
 
 @function_tool
 def goal_analyzer(
-    goal: str,
-    preferences: Optional[str] = None,
-    lifestyle: Optional[str] = None,
-    context: Optional[UserSessionContext] = None
+    ctx: RunContextWrapper[UserSessionContext],
+    goal: str, # This parameter is for the 'type' of goal (e.g., "Weight Loss")
+    preferences: str = "", # Input for dietary preferences (comma-separated string)
+    lifestyle: str = ""
 ) -> Dict:
     """
     Analyze the user's goal and return a structured health plan with sample meal and workout plans.
-
-    Args:
-        goal (str): The user's health and wellness goal.
-        preferences (str): The user's dietary preferences.
-        lifestyle (str): The user's lifestyle habits.
-        context (UserSessionContext, optional): Shared user session context.
-
-    Returns:
-        dict: A partial HealthPlanOutput structure with meal_plan, workout_plan, and notes.
     """
     print("📌 [Tool Triggered] goal_analyzer")
 
-    # Update context
-    if context:
-        context.goal = {
-            "goal": goal,
-            "preferences": preferences,
-            "lifestyle": lifestyle
-        }
+    # Update context using wrapper
+    if ctx.context:
+        # --- CRITICAL CORRECTION HERE ---
+        # Assign a Goal Pydantic object, not a raw dictionary
+        ctx.context.goal = Goal(
+            type=goal,
+            target="",  # You might want to parse a target from user input if available
+            duration="" # You might want to parse a duration from user input if available
+        )
+        # --------------------------------
 
-    # Generate basic mock data
+        # Assign preferences as a list of strings, consistent with user_context.py
+        ctx.context.diet_preferences = [pref.strip() for pref in preferences.split(',') if pref.strip()] if preferences else []
+
+        # If you were to update other optional models in ctx.context (like meal_plan, workout_plan),
+        # you would also need to construct them as their respective Pydantic objects.
+        # Example for meal_plan (hypothetical):
+        # sample_meal_days = [MealDay(day=f"Day {i+1}", meals=[m]) for i, m in enumerate(meal_plan)]
+        # ctx.context.meal_plan = MealPlan(days=sample_meal_days)
+
+        # Assuming injury_notes in ctx.context is now Optional[List[str]]
+        # ctx.context.injury_notes = ["No new injuries noted."] # Example assignment
+
+
+    # Sample data for the RETURN value of this tool (these are simple lists of strings)
+    # This part is correct for a tool's output.
     meal_plan = [
         "Day 1: Chickpea salad",
         "Day 2: Quinoa with vegetables",

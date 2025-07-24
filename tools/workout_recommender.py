@@ -1,35 +1,38 @@
 import asyncio
-from agents import function_tool
-from typing import Optional
-from context import UserSessionContext
+from agents import function_tool, RunContextWrapper
+from typing import Dict
+from user_context import UserSessionContext
 
 @function_tool
 async def workout_recommender(
+    ctx: RunContextWrapper[UserSessionContext],
     goal: str,
     experience: str = "",
-    preferences: str = "",
-    context: Optional[UserSessionContext] = None
-) -> dict:
+    preferences: str = ""
+) -> Dict:
     """
-    Asynchronously suggest a 7-day workout plan based on the user's goals and experience.
-
-    Args:
-        goal (str): The user's fitness goal.
-        experience (str): The user's fitness experience level (e.g., beginner, intermediate, advanced).
-        preferences (str): Any workout preferences or restrictions.
-        context (UserSessionContext, optional): Shared user session context.
-
-    Returns:
-        dict: A dictionary with a personalized 7-day workout plan.
+    Suggest a 7-day workout plan based on the user's goals and experience.
     """
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    workout_plan = [
-        f"{day}: 30 min brisk walk" for day in days
-    ]
-    await asyncio.sleep(0)  # Simulate async operation
+    print("📌 [Tool Triggered] workout_recommender")
 
-    # Optionally, you can still include context_info for debugging/logging
-    # but the main return should be a dict for agent output parsing
+    # Example use of context (optional)
+    if ctx.context:
+        ctx.context.workout_plan = {
+            "days": [
+                "Monday: 30 min brisk walk",
+                "Tuesday: 30 min brisk walk",
+                "Wednesday: 30 min brisk walk",
+                "Thursday: 30 min brisk walk",
+                "Friday: 30 min brisk walk",
+                "Saturday: 30 min brisk walk",
+                "Sunday: 30 min brisk walk"
+            ],
+            "details": f"Recommended for goal '{goal}' and experience '{experience}'"
+        }
+
+    await asyncio.sleep(0)  # Simulate async call if needed
+
     return {
-        "workout_plan": workout_plan
+        "workout_plan": ctx.context.workout_plan["days"] if ctx.context else [],
+        "notes": f"Generated for goal '{goal}', experience '{experience}', and preferences '{preferences}'"
     }

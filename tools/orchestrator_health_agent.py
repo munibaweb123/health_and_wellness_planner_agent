@@ -1,14 +1,12 @@
 from agents import Runner, function_tool
 from typing import Optional
-from context import UserSessionContext, HealthPlanOutput
+from user_context import UserSessionContext, HealthPlanOutput
 from tools.goal_analyzer import goal_analyzer
 from tools.meal_planner import meal_planner
 from tools.schedular import schedular
 from tools.tracker import tracker
 from tools.workout_recommender import workout_recommender
-from config import config
 
-@function_tool
 @function_tool
 async def orchestrate_health_plan(
     input_text: str,

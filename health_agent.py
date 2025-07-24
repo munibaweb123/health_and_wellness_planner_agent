@@ -65,35 +65,7 @@ async def health_guardrail(
         tripwire_triggered=not result.final_output.is_health_and_wellness,
     )
 
-@output_guardrail
-async def health_output_guardrail(
-    ctx: RunContextWrapper, agent: Agent, output
-) -> GuardrailFunctionOutput:
-    # Optionally, you can run another agent/tool here for validation
-    # For demonstration, let's assume you want to check if output is a valid HealthPlanOutput
 
-    # If you want to call another agent for validation, do it here (example commented out):
-    # result = await Runner.run(guardrail_agent, output, context=ctx.context, run_config=config)
-    # return GuardrailFunctionOutput(
-    #     output_info=result.final_output,
-    #     tripwire_triggered=not result.final_output.is_health_and_wellness,
-    # )
-
-    # Otherwise, just validate output structure
-    if isinstance(output, HealthPlanOutput):
-        return GuardrailFunctionOutput(
-            output_info=output,
-            tripwire_triggered=False
-        )
-    if isinstance(output, dict):
-        return GuardrailFunctionOutput(
-            output_info=HealthPlanOutput(**output),
-            tripwire_triggered=False
-        )
-    return GuardrailFunctionOutput(
-        output_info=HealthPlanOutput(notes="Output was not structured as expected."),
-        tripwire_triggered=True
-    )
 
 health_agent = Agent(
     name="Health and wellness planner agent",
@@ -103,5 +75,5 @@ health_agent = Agent(
     handoffs=[escalation_agent, injury_support_agent, nutrition_expert_agent],
     input_guardrails=[health_guardrail],
     output_type=HealthPlanOutput,
-    output_guardrails=[health_output_guardrail]
+    
 )

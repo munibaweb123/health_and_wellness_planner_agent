@@ -9,7 +9,7 @@ from utils.hooks import HealthAgentHooks
 from agents import Runner
 from health_agent import health_agent
 from tools.tracker import tracker
-from context import UserSessionContext
+from user_context import UserSessionContext
 from config import config
 
 # ----------------------------
@@ -17,6 +17,8 @@ from config import config
 # ----------------------------
 if "user_context" not in st.session_state:
     st.session_state.user_context = UserSessionContext(name="Muniba", uid=123)
+elif isinstance(st.session_state.user_context, dict):
+    st.session_state.user_context = UserSessionContext(**st.session_state.user_context)
 
 user_context = st.session_state.user_context
 user_id = str(user_context.uid)
